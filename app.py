@@ -121,32 +121,6 @@ def retrieve_relevant_chunks(query, top_k=5):
     results = collection.query(query_embeddings=[query_embedding], n_results=top_k)
     return results["documents"][0] if results else ["No relevant context found."]
 
-
-### 📌 LLM Selection Logic ###
-def generate_response(prompt):
-    if USE_HF_API:
-        # Use Hugging Face API
-        headers = {"Authorization": f"Bearer {HF_API_KEY}"}
-        response = requests.post(HF_API_URL, json={"inputs": prompt}, headers=headers)
-        return response.json()[0]['generated_text']
-
-    # elif USE_HF_LOCAL:
-    #     # Use Local Hugging Face Model
-    #     return hf_model(prompt, max_new_tokens=200)[0]["generated_text"]
-
-    # elif USE_GPT4ALL:
-    #     # Use GPT4ALL Local Model
-    #     with gpt4all_model.chat_session():
-    #         return gpt4all_model.generate(prompt, max_tokens=250)
-    
-    return "❌ No LLM is enabled!"
-
-### 📌 API Endpoint for Querying ###
-@app.post("/ask")
-def ask_question(request: QueryRequest):
-    response = generate_response(request.query)
-    return {"query": request.query, "response": response}
-
 def generate_response(query, context):
     prompt = f"""
     Based on the following document excerpts, answer the question as accurately as possible.
@@ -175,14 +149,14 @@ def generate_response(query, context):
         else:
             print("Error: Unexpected response format", output)
 
-    elif USE_HF_LOCAL:
-        # Use Local Hugging Face Model
-        return hf_model(prompt, max_new_tokens=200)[0]["generated_text"]
+    # elif USE_HF_LOCAL:
+    #     # Use Local Hugging Face Model
+    #     return hf_model(prompt, max_new_tokens=200)[0]["generated_text"]
 
-    elif USE_GPT4ALL:
-        # Use GPT4ALL Local Model
-        with gpt4all_model.chat_session():
-            return gpt4all_model.generate(prompt, max_tokens=250)
+    # elif USE_GPT4ALL:
+    #     # Use GPT4ALL Local Model
+    #     with gpt4all_model.chat_session():
+    #         return gpt4all_model.generate(prompt, max_tokens=250)
     
     return "❌ No LLM is enabled!"
 

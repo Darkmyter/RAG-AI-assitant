@@ -2,15 +2,17 @@ import gradio as gr
 import requests
 import base64
 import os
+LOCAL = False
 
 RAILWAY_API_URL = os.getenv("RAILWAY_API_URL", "https://rag-ai-assitant-production.up.railway.app")
 
-API_URL_ASK = f"{RAILWAY_API_URL}/ask"
-API_URL_UPDATE = f"{RAILWAY_API_URL}/update_db"
-
 # API Endpoints
-# API_URL_ASK = "http://127.0.0.1:8000/ask"
-# API_URL_UPDATE = "http://127.0.0.1:8000/update_db"
+if LOCAL:
+    API_URL_ASK = "http://127.0.0.1:8000/ask"
+    API_URL_UPDATE = "http://127.0.0.1:8000/update_db"
+else:
+    API_URL_ASK = f"{RAILWAY_API_URL}/ask"
+    API_URL_UPDATE = f"{RAILWAY_API_URL}/update_db"
 
 ### 📌 Function: Convert PDF (Binary) to Base64 ###
 def encode_pdf_to_base64(file_binary):
@@ -68,4 +70,7 @@ with gr.Blocks() as demo:
     ask_button.click(ask_question, inputs=[question_input], outputs=[answer_output])
 
 # Run the Gradio UI
-demo.launch(server_name="0.0.0.0", server_port=int(os.getenv("PORT", 7860)))
+if LOCAL:
+    demo.launch(server_name="127.0.0.1", server_port=7860)
+else:
+    demo.launch(server_name="0.0.0.0", server_port=int(os.getenv("PORT", 7860)))
