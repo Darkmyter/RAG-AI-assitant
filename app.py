@@ -19,16 +19,16 @@ USE_GPT4ALL = False      # GPT4ALL Local Model (Runs Offline)
 HF_API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3"
 HF_API_KEY = os.getenv("HF_API_KEY")
 
-# Load Hugging Face Local Model (if enabled)
-if USE_HF_LOCAL:
-    from transformers import pipeline
-    hf_model = pipeline("text-generation", model="Qwen/Qwen2.5-7B-Instruct", device_map="auto")
+# # Load Hugging Face Local Model (if enabled)
+# if USE_HF_LOCAL:
+#     from transformers import pipeline
+#     hf_model = pipeline("text-generation", model="Qwen/Qwen2.5-7B-Instruct", device_map="auto")
 
-# Load GPT4ALL Local Model (if enabled)
-if USE_GPT4ALL:
-    from gpt4all import GPT4All
-    model_path = "models/Llama-3.2-3B-Instruct-Q4_0.gguf"
-    gpt4all_model = GPT4All(model_path)
+# # Load GPT4ALL Local Model (if enabled)
+# if USE_GPT4ALL:
+#     from gpt4all import GPT4All
+#     model_path = "models/Llama-3.2-3B-Instruct-Q4_0.gguf"
+#     gpt4all_model = GPT4All(model_path)
 
 # Initialize FastAPI
 app = FastAPI()
@@ -130,14 +130,14 @@ def generate_response(prompt):
         response = requests.post(HF_API_URL, json={"inputs": prompt}, headers=headers)
         return response.json()[0]['generated_text']
 
-    elif USE_HF_LOCAL:
-        # Use Local Hugging Face Model
-        return hf_model(prompt, max_new_tokens=200)[0]["generated_text"]
+    # elif USE_HF_LOCAL:
+    #     # Use Local Hugging Face Model
+    #     return hf_model(prompt, max_new_tokens=200)[0]["generated_text"]
 
-    elif USE_GPT4ALL:
-        # Use GPT4ALL Local Model
-        with gpt4all_model.chat_session():
-            return gpt4all_model.generate(prompt, max_tokens=250)
+    # elif USE_GPT4ALL:
+    #     # Use GPT4ALL Local Model
+    #     with gpt4all_model.chat_session():
+    #         return gpt4all_model.generate(prompt, max_tokens=250)
     
     return "❌ No LLM is enabled!"
 
