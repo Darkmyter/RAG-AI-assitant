@@ -7,7 +7,28 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
 import chromadb
 import os
+import requests
 import tempfile
+
+# Choose which LLM to use
+USE_HF_API = True        # Hugging Face API (Free cloud-based)
+USE_HF_LOCAL = False     # Hugging Face Local Model (Requires `transformers`)
+USE_GPT4ALL = False      # GPT4ALL Local Model (Runs Offline)
+
+# Hugging Face API Configuration
+HF_API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3"
+HF_API_KEY = os.getenv("HF_API_KEY")
+
+# Load Hugging Face Local Model (if enabled)
+if USE_HF_LOCAL:
+    from transformers import pipeline
+    hf_model = pipeline("text-generation", model="Qwen/Qwen2.5-7B-Instruct", device_map="auto")
+
+# Load GPT4ALL Local Model (if enabled)
+if USE_GPT4ALL:
+    from gpt4all import GPT4All
+    model_path = "models/Llama-3.2-3B-Instruct-Q4_0.gguf"
+    gpt4all_model = GPT4All(model_path)
 
 # Initialize FastAPI
 app = FastAPI()
@@ -19,10 +40,6 @@ embedding_model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 chroma_db_path = "./chroma_db"
 chroma_client = chromadb.PersistentClient(path=chroma_db_path)
 collection = chroma_client.get_or_create_collection(name="documents")
-
-# Load GPT4ALL Model
-model_path = "c:/Users/bader/AppData/Local/nomic.ai/GPT4All/Llama-3.2-3B-Instruct-Q4_0.gguf"
-gpt4all_model = GPT4All(model_path)
 
 # Define API Request Schema
 class QueryRequest(BaseModel):
@@ -105,6 +122,31 @@ def retrieve_relevant_chunks(query, top_k=5):
     return results["documents"][0] if results else ["No relevant context found."]
 
 
+### 📌 LLM Selection Logic ###
+def generate_response(prompt):
+    if USE_HF_API:
+        # Use Hugging Face API
+        headers = {"Authorization": f"Bearer {HF_API_KEY}"}
+        response = requests.post(HF_API_URL, json={"inputs": prompt}, headers=headers)
+        return response.json()[0]['generated_text']
+
+    elif USE_HF_LOCAL:
+        # Use Local Hugging Face Model
+        return hf_model(prompt, max_new_tokens=200)[0]["generated_text"]
+
+    elif USE_GPT4ALL:
+        # Use GPT4ALL Local Model
+        with gpt4all_model.chat_session():
+            return gpt4all_model.generate(prompt, max_tokens=250)
+    
+    return "❌ No LLM is enabled!"
+
+### 📌 API Endpoint for Querying ###
+@app.post("/ask")
+def ask_question(request: QueryRequest):
+    response = generate_response(request.query)
+    return {"query": request.query, "response": response}
+
 def generate_response(query, context):
     prompt = f"""
     Based on the following document excerpts, answer the question as accurately as possible.
@@ -119,11 +161,30 @@ def generate_response(query, context):
 
     ANSWER:
     """
+
+    if USE_HF_API:
+        # Use Hugging Face API
+        headers = {"Authorization": f"Bearer {HF_API_KEY}"}
+        payload = {"inputs": prompt}
+        response = requests.post(HF_API_URL, json=payload, headers=headers)
+        output = response.json()
+        # Extract generated text only
+        if isinstance(output, list) and "generated_text" in output[0]:
+            generated_text = output[0]["generated_text"].replace(payload["inputs"], "").strip()
+            return generated_text
+        else:
+            print("Error: Unexpected response format", output)
+
+    elif USE_HF_LOCAL:
+        # Use Local Hugging Face Model
+        return hf_model(prompt, max_new_tokens=200)[0]["generated_text"]
+
+    elif USE_GPT4ALL:
+        # Use GPT4ALL Local Model
+        with gpt4all_model.chat_session():
+            return gpt4all_model.generate(prompt, max_tokens=250)
     
-    with gpt4all_model.chat_session():
-        response = gpt4all_model.generate(prompt, max_tokens=250)
-    
-    return response
+    return "❌ No LLM is enabled!"
 
 
 ### 📌 ROUTE 3: Home Route ###
