@@ -68,4 +68,4 @@ with gr.Blocks() as demo:
     ask_button.click(ask_question, inputs=[question_input], outputs=[answer_output])
 
 # Run the Gradio UI
-demo.launch(server_name="127.0.0.1", server_port=7860)
+demo.launch(server_name="0.0.0.0", server_port=int(os.getenv("PORT", 7860)))

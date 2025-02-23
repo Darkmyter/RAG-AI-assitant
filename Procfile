@@ -1,2 +1,1 @@
-web: uvicorn app:app --host 0.0.0.0 --port $PORT &
-web: python app_ui.py
+web: uvicorn app:app --host 0.0.0.0 --port $PORT & python app_ui.py
