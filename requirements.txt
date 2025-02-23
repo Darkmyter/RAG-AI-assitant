@@ -1,0 +1,16 @@
+langchain
+chromadb
+huggingface-hub
+sentence-transformers
+pypdf
+unstructured
+gpt4all
+langchain_community
+tiktoken
+gpt4all
+fastapi
+uvicorn
+python-multipart
+gradio
+
+
