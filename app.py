@@ -1,7 +1,7 @@
 import base64
 from fastapi import FastAPI
 from pydantic import BaseModel
-from gpt4all import GPT4All
+# from gpt4all import GPT4All
 from sentence_transformers import SentenceTransformer
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
