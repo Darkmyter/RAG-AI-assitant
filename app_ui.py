@@ -1,10 +1,16 @@
 import gradio as gr
 import requests
 import base64
+import os
+
+RAILWAY_API_URL = os.getenv("RAILWAY_API_URL", "https://rag-ai-assitant-production.up.railway.app")
+
+API_URL_ASK = f"{RAILWAY_API_URL}/ask"
+API_URL_UPDATE = f"{RAILWAY_API_URL}/update_db"
 
 # API Endpoints
-API_URL_ASK = "http://127.0.0.1:8000/ask"
-API_URL_UPDATE = "http://127.0.0.1:8000/update_db"
+# API_URL_ASK = "http://127.0.0.1:8000/ask"
+# API_URL_UPDATE = "http://127.0.0.1:8000/update_db"
 
 ### 📌 Function: Convert PDF (Binary) to Base64 ###
 def encode_pdf_to_base64(file_binary):
