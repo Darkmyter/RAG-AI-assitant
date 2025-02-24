@@ -208,7 +208,7 @@ with gr.Blocks() as demo:
 demo.launch(server_name="0.0.0.0", server_port=7860)
 ```
 
-### .env Configuration
+### 4. .env Configuration
 
 Create a `.env` file to store environment variables locally before deployment:
 
@@ -217,24 +217,13 @@ HF_API_KEY=your_huggingface_api_key
 RAILWAY_API_URL=https://your-railway-url
 ```
 
-## Railway Deployment
-
-### Procfile
+### 5. Procfile
 
 To ensure Railway runs the application correctly, create a `Procfile` in the root directory with the following content:
 
 ```sh
 web: uvicorn app:app --host 0.0.0.0 --port $PORT
 ui: python app_ui.py
-```
-
-### .env Configuration
-
-Create a `.env` file to store environment variables locally before deployment:
-
-```sh
-HF_API_KEY=your_huggingface_api_key
-RAILWAY_API_URL=https://your-railway-url
 ```
 
 ## Railway Deployment
