@@ -4,10 +4,9 @@ huggingface-hub
 sentence-transformers
 pypdf
 unstructured
-gpt4all
+# gpt4all
 langchain_community
-tiktoken
-gpt4all
+# tiktoken
 fastapi
 uvicorn
 python-multipart
