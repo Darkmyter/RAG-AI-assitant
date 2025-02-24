@@ -5,12 +5,12 @@ from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
+from dotenv import load_dotenv
 import chromadb
 import os
 import requests
 import tempfile
 
-import logging
 import logging
 
 # Configure logging
@@ -18,7 +18,8 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 
-
+# Load environment variables from .env file
+load_dotenv()
 
 # Choose which LLM to use
 USE_HF_API = True        # Hugging Face API (Free cloud-based)
@@ -28,6 +29,7 @@ USE_GPT4ALL = False      # GPT4ALL Local Model (Runs Offline)
 # Hugging Face API Configuration
 HF_API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3"
 HF_API_KEY = os.getenv("HF_API_KEY")
+print(HF_API_KEY)
 
 # # Load Hugging Face Local Model (if enabled)
 # if USE_HF_LOCAL:
@@ -153,6 +155,7 @@ def generate_response(query, context):
 
     ANSWER:
     """
+    print(USE_HF_API)
 
     if USE_HF_API:
         # Use Hugging Face API

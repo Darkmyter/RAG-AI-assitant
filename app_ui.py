@@ -2,7 +2,7 @@ import gradio as gr
 import requests
 import base64
 import os
-LOCAL = False
+LOCAL = True
 
 RAILWAY_API_URL = os.getenv("RAILWAY_API_URL", "https://rag-ai-assitant-production.up.railway.app")
 
