@@ -10,6 +10,16 @@ import os
 import requests
 import tempfile
 
+import logging
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
+
+
+
+
 # Choose which LLM to use
 USE_HF_API = True        # Hugging Face API (Free cloud-based)
 USE_HF_LOCAL = False     # Hugging Face Local Model (Requires `transformers`)
@@ -51,6 +61,14 @@ class Base64PDFUpload(BaseModel):
 
 class Base64PDFUploadList(BaseModel):
     files: list[Base64PDFUpload]
+
+@app.on_event("startup")
+async def startup_event():
+    logger.info("🚀 Application is starting...")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    logger.info("🛑 Application is shutting down...")
 
 ### 📌 ROUTE 1: Retrieve and Answer Queries ###
 @app.post("/ask")
